@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	scpi "github.com/jamesonhm/devulator/scpi"
+	"github.com/jamesonhm/devulator/scpi"
 )
 
 func main() {

@@ -1,0 +1,38 @@
+/* SCPI Grammar in Extended Backus-Naur Form (EBNF) */
+
+/* Top-level structure */
+Command ::= Header [Query] [WhiteSpace] [Parameters] [Terminator]
+
+/* Header structure */
+Header ::= [Colon] Node {Colon Node}
+Node ::= LongForm | ShortForm
+LongForm ::= UpperCase {UpperCase | Digit}
+ShortForm ::= UpperCase [LowerCase] [LowerCase]
+
+/* Query indicator */
+Query ::= "?"
+
+/* Parameters */
+Parameters ::= Parameter {Comma Parameter}
+Parameter ::= NumericParameter | StringParameter | CharacterParameter
+NumericParameter ::= [Sign] Integer [Dot [Integer]] [Suffix]
+StringParameter ::= DoubleQuote {Character} DoubleQuote
+CharacterParameter ::= Character
+
+/* Basic elements */
+Colon ::= ":"
+Comma ::= ","
+WhiteSpace ::= " " | "\t"
+Terminator ::= "\n" | ";"
+DoubleQuote ::= '"'
+Sign ::= "+" | "-"
+Dot ::= "."
+Integer ::= Digit {Digit}
+Suffix ::= Character {Character}
+
+/* Character sets */
+UpperCase ::= "A" | "B" | "C" | ... | "Z"
+LowerCase ::= "a" | "b" | "c" | ... | "z"
+Digit ::= "0" | "1" | "2" | ... | "9"
+Character ::= UpperCase | LowerCase | Digit | SpecialCharacter
+SpecialCharacter ::= "!" | "@" | "#" | "$" | "%" | "^" | "&" | "*" | "(" | ")" | "-" | "_" | "+" | "=" | "[" | "]" | "{" | "}" | "|" | "\" | ":" | ";" | "'" | "<" | ">" | "," | "." | "?" | "/"
