@@ -29,6 +29,7 @@ const (
 	CARROT
 	LEFT_PAREN
 	RIGHT_PAREN
+	EOF
 )
 
 func (tt TokenType) TokenString() string {
@@ -36,5 +37,5 @@ func (tt TokenType) TokenString() string {
 }
 
 func (tt TokenType) EnumIndex() int {
-	return int(d)
+	return int(tt)
 }
