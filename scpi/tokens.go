@@ -1,10 +1,17 @@
 package scpi
 
+import "fmt"
+
 type Token struct {
-	tokenType TokenType
-	start     int
-	length    int
-	line      int
+	tType  TokenType
+	lexeme string
+	start  int
+	length int
+	line   int
+}
+
+func (t Token) debug() {
+	fmt.Printf("%s %d-%d, [%d]\n", t.lexeme, t.start, t.length, t.line)
 }
 
 type TokenType int
@@ -30,12 +37,13 @@ const (
 	LEFT_PAREN
 	RIGHT_PAREN
 	EOF
+	ERROR
 )
 
-func (tt TokenType) TokenString() string {
-	return [...]string{":", ",", " ", ";", "\"", "+"}[tt-1]
-}
+//func (tt TokenType) TokenString() string {
+//	return [...]string{":", ",", " ", ";", "\"", "+"}[tt-1]
+//}
 
-func (tt TokenType) EnumIndex() int {
+func (tt TokenType) enumIndex() int {
 	return int(tt)
 }
