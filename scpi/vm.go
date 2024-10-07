@@ -1,19 +1,19 @@
 package scpi
 
-import "fmt"
+//import "fmt"
 
 type VM struct {
 }
 
-func (vm *VM) Interpret(src string) {
+// type InterpretResult int
+//
+// const (
+// 	INTERPRET_OK InterpretResult = iota
+// 	INTERPRET_COMPILE_ERROR
+// 	INTERPRET_RUNTIME_ERROR
+// )
 
-	scanner := intiScanner(src)
-	for {
-		t := scanner.scanToken()
-		fmt.Println("TYPE: ", t.tType)
-		if t.tType == EOF {
-			break
-		}
-		t.debug()
-	}
+func (vm *VM) Interpret(src string) error {
+	compile(src)
+	return nil
 }
