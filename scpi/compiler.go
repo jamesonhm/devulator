@@ -5,7 +5,8 @@ import (
 )
 
 func compile(source string) {
-	scanner := initScanner(source)
+	runesrc := []rune(source)
+	scanner := initScanner(runesrc)
 	for {
 		t := scanner.scanToken()
 		fmt.Println("TYPE: ", t.tType)

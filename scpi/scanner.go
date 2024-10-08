@@ -5,7 +5,7 @@ import "unicode"
 // import "fmt"
 
 type Scanner struct {
-	source  string
+	source  []rune
 	start   int
 	current int
 	line    int
@@ -19,7 +19,7 @@ func (s *Scanner) scanToken() Token {
 	}
 	c := s.advance()
 	//	fmt.Println("From Scanner, next c: ", string(c))
-	if unicode.IsDigit(rune(c)) {
+	if unicode.IsDigit(c) {
 		return s.number()
 	}
 
@@ -96,7 +96,7 @@ func ternary[T any](cond bool, tval T, fval T) T {
 	return fval
 }
 
-func initScanner(src string) Scanner {
+func initScanner(src []rune) Scanner {
 	return Scanner{
 		source:  src,
 		start:   0,
@@ -105,19 +105,19 @@ func initScanner(src string) Scanner {
 	}
 }
 
-func (s *Scanner) advance() byte {
+func (s *Scanner) advance() rune {
 	s.current++
 	return s.source[s.current-1]
 }
 
-func (s *Scanner) peek(n int) byte {
+func (s *Scanner) peek(n int) rune {
 	if s.current+n >= len(s.source) {
 		return '\000'
 	}
 	return s.source[s.current+n]
 }
 
-func (s *Scanner) match(expected byte) bool {
+func (s *Scanner) match(expected rune) bool {
 	if s.isAtEnd() {
 		return false
 	}
@@ -135,7 +135,7 @@ func (s *Scanner) isAtEnd() bool {
 func (s *Scanner) makeToken(tt TokenType) Token {
 	return Token{
 		tType:  tt,
-		lexeme: s.source[s.start:s.current],
+		lexeme: string(s.source[s.start:s.current]),
 		start:  s.start,
 		length: s.current - s.start,
 		line:   s.line,
@@ -171,13 +171,13 @@ func (s *Scanner) skipWitespace() {
 }
 
 func (s *Scanner) number() Token {
-	for unicode.IsDigit(rune(s.peek(0))) {
+	for unicode.IsDigit(s.peek(0)) {
 		s.advance()
 	}
-	if s.peek(0) == '.' && unicode.IsDigit(rune(s.peek(1))) {
+	if s.peek(0) == '.' && unicode.IsDigit(s.peek(1)) {
 		s.advance()
 
-		for unicode.IsDigit(rune(s.peek(0))) {
+		for unicode.IsDigit(s.peek(0)) {
 			s.advance()
 		}
 	}
