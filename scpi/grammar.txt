@@ -14,10 +14,10 @@ Query ::= "?"
 
 /* Parameters */
 Parameters ::= Parameter {Comma Parameter}
-Parameter ::= NumericParameter | StringParameter | CharacterParameter
-NumericParameter ::= [Sign] Integer [Dot [Integer]] [Suffix]
-StringParameter ::= DoubleQuote {Character} DoubleQuote
-CharacterParameter ::= Character
+Parameter ::= NumericParameter | DiscreetParameter | BooleanParameter
+NumericParameter ::= [Sign] Integer [Dot [Integer]] [Suffix] | SpecialValue
+DiscreetParameter ::= Character {Character}
+BooleanParameter ::= OFF | 0 | ON | 1
 
 /* Basic elements */
 Colon ::= ":"
@@ -29,6 +29,7 @@ Sign ::= "+" | "-"
 Dot ::= "."
 Integer ::= Digit {Digit}
 Suffix ::= Character {Character}
+SpecialValue ::= MIN | MAX | DEF
 
 /* Character sets */
 UpperCase ::= "A" | "B" | "C" | ... | "Z"

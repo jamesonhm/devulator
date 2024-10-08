@@ -5,15 +5,15 @@ package scpi
 type VM struct {
 }
 
-// type InterpretResult int
-//
-// const (
-// 	INTERPRET_OK InterpretResult = iota
-// 	INTERPRET_COMPILE_ERROR
-// 	INTERPRET_RUNTIME_ERROR
-// )
+type InterpretResult int
 
-func (vm *VM) Interpret(src string) error {
+const (
+	INTERPRET_OK InterpretResult = iota
+	INTERPRET_COMPILE_ERROR
+	INTERPRET_RUNTIME_ERROR
+)
+
+func (vm *VM) Interpret(src string) InterpretResult {
 	compile(src)
-	return nil
+	return INTERPRET_OK
 }
