@@ -1,8 +1,10 @@
 package scpi
 
-import "unicode"
-
-// import "fmt"
+import (
+	"fmt"
+	"strings"
+	"unicode"
+)
 
 type Scanner struct {
 	source  []rune
@@ -19,9 +21,13 @@ func (s *Scanner) scanToken() Token {
 	}
 	c := s.advance()
 	//	fmt.Println("From Scanner, next c: ", string(c))
+	if unicode.IsLetter(c) {
+		return s.identifier()
+	}
 	if unicode.IsDigit(c) {
 		return s.number()
 	}
+	// TODO: add numeric cases for binary, hexadecimal, octal
 
 	switch c {
 	// 	case '!':
@@ -96,9 +102,11 @@ func ternary[T any](cond bool, tval T, fval T) T {
 	return fval
 }
 
-func initScanner(src []rune) Scanner {
+func initScanner(src string) Scanner {
+	src = strings.ToUpper(src)
+	runesrc := []rune(src)
 	return Scanner{
-		source:  src,
+		source:  runesrc,
 		start:   0,
 		current: 0,
 		line:    1,
@@ -168,6 +176,18 @@ func (s *Scanner) skipWitespace() {
 			return
 		}
 	}
+}
+
+func (s *Scanner) identifier() Token {
+	for unicode.IsLetter(s.peek(0)) {
+		s.advance()
+	}
+	lexeme := string(s.source[s.start:s.current])
+	if _, ok := kws[lexeme]; ok {
+		return s.makeToken(NODE)
+	}
+	msg := fmt.Sprintf("Unrecognized Keyword: %s", lexeme)
+	return s.errorToken(msg)
 }
 
 func (s *Scanner) number() Token {

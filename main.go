@@ -19,7 +19,8 @@ func run() (int, error) {
 	src := `  :,(!@#$%)		*!=
 	@@@ _()
 	12
-	23.4`
+	23.4
+	abort:AbO:CalculTE`
 	fmt.Println("Source: ", src)
 	vm := scpi.VM{}
 	res := vm.Interpret(src)
