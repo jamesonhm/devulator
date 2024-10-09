@@ -11,7 +11,7 @@ type Token struct {
 }
 
 func (t Token) debug() {
-	fmt.Printf("%s %d-%d, [%d]\n", t.lexeme, t.start, t.length, t.line)
+	fmt.Printf("%q %d-%d, [%d]\n", t.lexeme, t.start, t.length, t.line)
 }
 
 type TokenType int
@@ -51,6 +51,7 @@ const (
 
 	BANG_EQUAL
 	WHITE_SPACE
+	NEWLINE
 
 	NUMBER
 	NODE

@@ -14,13 +14,16 @@ type Scanner struct {
 }
 
 func (s *Scanner) scanToken() Token {
-	s.skipWitespace()
+	// s.skipWitespace()
 	s.start = s.current
 	if s.isAtEnd() {
 		return s.makeToken(EOF)
 	}
 	c := s.advance()
 	//	fmt.Println("From Scanner, next c: ", string(c))
+	// if strings.ContainsRune(" \t", c) {
+	// 	return s.whitespace()
+	// }
 	if unicode.IsLetter(c) {
 		return s.identifier()
 	}
@@ -44,8 +47,6 @@ func (s *Scanner) scanToken() Token {
 		return s.makeToken(CARROT)
 	case '&':
 		return s.makeToken(AMPERSAND)
-	case '*':
-		return s.makeToken(STAR)
 	case '(':
 		return s.makeToken(LEFT_PAREN)
 	case ')':
@@ -90,9 +91,16 @@ func (s *Scanner) scanToken() Token {
 		return s.makeToken(SLASH)
 	case '!':
 		return s.makeToken(ternary(s.match('='), BANG_EQUAL, BANG))
+	case ' ':
+		return s.makeToken(WHITE_SPACE)
+	case '\n':
+		s.line++
+		return s.makeToken(NEWLINE)
+	case '*':
+		return s.makeToken(STAR)
 	}
 
-	return s.errorToken("Unexpected character")
+	return s.errorToken(fmt.Sprintf("Unrecognized Keyword: %q", c))
 }
 
 func ternary[T any](cond bool, tval T, fval T) T {
@@ -102,8 +110,12 @@ func ternary[T any](cond bool, tval T, fval T) T {
 	return fval
 }
 
+func trimLeftSpace(s string) string {
+	return strings.TrimLeftFunc(s, unicode.IsSpace)
+}
+
 func initScanner(src string) Scanner {
-	src = strings.ToUpper(src)
+	src = trimLeftSpace(strings.ToUpper(src))
 	runesrc := []rune(src)
 	return Scanner{
 		source:  runesrc,
@@ -176,6 +188,19 @@ func (s *Scanner) skipWitespace() {
 			return
 		}
 	}
+}
+
+func (s *Scanner) whitespace() Token {
+	for {
+		c := s.peek(0)
+		switch c {
+		case ' ', '\t':
+			s.advance()
+		default:
+			return s.makeToken(WHITE_SPACE)
+		}
+	}
+	//return s.makeToken(WHITE_SPACE)
 }
 
 func (s *Scanner) identifier() Token {

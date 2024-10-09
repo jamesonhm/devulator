@@ -22,6 +22,35 @@ type void struct{}
 
 var m void
 
+var specials = map[string]void{
+	"MIN": m,
+	"MAX": m,
+	"DEF": m,
+}
+
+var bools = map[string]void{
+	"ON":  m,
+	"OFF": m,
+}
+
+var common = map[string]void{
+	"*CLS": m,
+	"*DMC": m,
+	"*EMC": m,
+	"*ESE": m,
+	"*ESR": m,
+	"*IDN": m,
+	"*LRN": m,
+	"*OPC": m,
+	"*PCB": m,
+	"*RST": m,
+	"*SRE": m,
+	"*STB": m,
+	"*TRG": m,
+	"*TST": m,
+	"*WAI": m,
+}
+
 var kws = map[string]void{
 	"ABOR":      m,
 	"ABORT":     m,
@@ -66,3 +95,6 @@ func checkCommand() func(string) bool {
 		return ok
 	}
 }
+
+// checkCommand()("ABORT") = true
+// checkCommand()("XYZ") = false
