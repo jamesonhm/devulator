@@ -11,14 +11,14 @@ type Token struct {
 }
 
 func (t Token) debug() {
-	fmt.Printf("%q %d-%d, [%d]\n", t.lexeme, t.start, t.length, t.line)
+	fmt.Printf("[%d] %v\t   %q\n", t.line, t.tType.tokenString(), t.lexeme)
 }
 
 type TokenType int
 
 const (
 	// Single Character
-	BANG TokenType = iota
+	BANG TokenType = iota + 1
 	AT
 	HASH
 	DOLLAR
@@ -40,8 +40,6 @@ const (
 	BACKASLASH
 	COLON
 	SEMICOLON
-	SQUOTE
-	DQUOTE
 	LESS
 	GREATER
 	COMMA
@@ -58,14 +56,57 @@ const (
 	UNITS
 	BOOL
 	SPECIAL // MIN, MAX, INF, ...
+	COMMON_CMD
+	STRING
 
 	ERROR
 	EOF
 )
 
-//func (tt TokenType) TokenString() string {
-//	return [...]string{":", ",", " ", ";", "\"", "+"}[tt-1]
-//}
+func (tt TokenType) tokenString() string {
+	return [...]string{
+		"_",
+		"BANG",
+		"AT",
+		"HASH",
+		"DOLLAR",
+		"PERCENT",
+		"CARROT",
+		"AMPERSAND",
+		"STAR",
+		"LEFT_PAREN",
+		"RIGHT_PAREN",
+		"MINUS",
+		"PLUS",
+		"UNDERSCORE",
+		"EQUAL",
+		"LEFT_SQUARE",
+		"RIGHT_SQUARE",
+		"LEFT_CURLY",
+		"RIGHT_CURLY",
+		"PIPE",
+		"BACKASLASH",
+		"COLON",
+		"SEMICOLON",
+		"LESS",
+		"GREATER",
+		"COMMA",
+		"DOT",
+		"QUERY",
+		"SLASH",
+		"BANG_EQUAL",
+		"WHITE_SPACE",
+		"NEWLINE",
+		"NUMBER",
+		"NODE",
+		"UNITS",
+		"BOOL",
+		"SPECIAL",
+		"COMMON_CMD",
+		"STRING",
+		"ERROR",
+		"EOF"}[tt]
+}
 
 func (tt TokenType) enumIndex() int {
 	return int(tt)

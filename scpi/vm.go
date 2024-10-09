@@ -22,18 +22,26 @@ type void struct{}
 
 var m void
 
-var specials = map[string]void{
+func wordInSet(s string, set map[string]void) bool {
+	_, ok := set[s]
+	if ok {
+		return true
+	}
+	return false
+}
+
+var SPECIALS = map[string]void{
 	"MIN": m,
 	"MAX": m,
 	"DEF": m,
 }
 
-var bools = map[string]void{
+var BOOLS = map[string]void{
 	"ON":  m,
 	"OFF": m,
 }
 
-var common = map[string]void{
+var COMMONS = map[string]void{
 	"*CLS": m,
 	"*DMC": m,
 	"*EMC": m,
@@ -84,17 +92,3 @@ var kws = map[string]void{
 	"SYST":      m,
 	"SYSTEM":    m,
 }
-
-func checkCommand() func(string) bool {
-	innerMap := map[string]void{
-		"ABORT": m,
-		"AFR":   m,
-	}
-	return func(key string) bool {
-		_, ok := innerMap[key]
-		return ok
-	}
-}
-
-// checkCommand()("ABORT") = true
-// checkCommand()("XYZ") = false

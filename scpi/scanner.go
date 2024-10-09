@@ -24,7 +24,7 @@ func (s *Scanner) scanToken() Token {
 	// if strings.ContainsRune(" \t", c) {
 	// 	return s.whitespace()
 	// }
-	if unicode.IsLetter(c) {
+	if unicode.IsLetter(c) || c == '*' {
 		return s.identifier()
 	}
 	if unicode.IsDigit(c) {
@@ -77,10 +77,8 @@ func (s *Scanner) scanToken() Token {
 		return s.makeToken(COLON)
 	case ';':
 		return s.makeToken(SEMICOLON)
-	case '\'':
-		return s.makeToken(SQUOTE)
 	case '"':
-		return s.makeToken(DQUOTE)
+		return s.string()
 	case '<':
 		return s.makeToken(LESS)
 	case '>':
@@ -96,11 +94,11 @@ func (s *Scanner) scanToken() Token {
 	case '\n':
 		s.line++
 		return s.makeToken(NEWLINE)
-	case '*':
-		return s.makeToken(STAR)
+	// case '*':
+	// 	return s.starWord()
+	default:
+		return s.errorToken(fmt.Sprintf("Unrecognized Keyword: %q", c))
 	}
-
-	return s.errorToken(fmt.Sprintf("Unrecognized Keyword: %q", c))
 }
 
 func ternary[T any](cond bool, tval T, fval T) T {
@@ -190,6 +188,20 @@ func (s *Scanner) skipWitespace() {
 	}
 }
 
+func (s *Scanner) string() Token {
+	for s.peek(0) != '"' && !s.isAtEnd() {
+		if s.peek(0) == '\n' {
+			s.line++
+		}
+		s.advance()
+	}
+	if s.isAtEnd() {
+		return s.errorToken("Unterminated string.")
+	}
+	s.advance()
+	return s.makeToken(STRING)
+}
+
 func (s *Scanner) whitespace() Token {
 	for {
 		c := s.peek(0)
@@ -200,19 +212,26 @@ func (s *Scanner) whitespace() Token {
 			return s.makeToken(WHITE_SPACE)
 		}
 	}
-	//return s.makeToken(WHITE_SPACE)
 }
 
-func (s *Scanner) identifier() Token {
+func (s *Scanner) word() string {
 	for unicode.IsLetter(s.peek(0)) {
 		s.advance()
 	}
-	lexeme := string(s.source[s.start:s.current])
-	if _, ok := kws[lexeme]; ok {
+	return string(s.source[s.start:s.current])
+}
+
+func (s *Scanner) identifier() Token {
+	word := s.word()
+	if wordInSet(word, SPECIALS) {
+		return s.makeToken(SPECIAL)
+	} else if wordInSet(word, BOOLS) {
+		return s.makeToken(BOOL)
+	} else if wordInSet(word, COMMONS) {
+		return s.makeToken(COMMON_CMD)
+	} else {
 		return s.makeToken(NODE)
 	}
-	return s.errorToken(fmt.Sprintf("Unrecognized Keyword: %s", lexeme))
-
 }
 
 func (s *Scanner) number() Token {

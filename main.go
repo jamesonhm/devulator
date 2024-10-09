@@ -16,12 +16,14 @@ func main() {
 }
 
 func run() (int, error) {
-	src := `  :,(!@#$%)  *!=
-	@@@ _()
-	12
-	23.4
-	abort:AbO:CalculaTE`
-
+	// 	src := `  COMMand:stuFF?;*ABC  *!=
+	// 	:DATA 4,"this is a string";
+	// 	12
+	// 	23.4
+	// 	abort:AbO:CalculaTE`
+	src := `TEST:A 1,"stringy 
+	string continued"
+	123.45 ON OFF *RST`
 	fmt.Println("Source: ", src)
 
 	vm := scpi.VM{}
