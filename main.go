@@ -20,9 +20,12 @@ func run() (int, error) {
 	@@@ _()
 	12
 	23.4
-	abort:AbO:CalculTE`
+	abort:AbO:CalculaTE`
+
 	fmt.Println("Source: ", src)
+
 	vm := scpi.VM{}
+
 	res := vm.Interpret(src)
 	if res != scpi.INTERPRET_OK {
 		switch res {

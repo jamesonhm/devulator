@@ -186,8 +186,8 @@ func (s *Scanner) identifier() Token {
 	if _, ok := kws[lexeme]; ok {
 		return s.makeToken(NODE)
 	}
-	msg := fmt.Sprintf("Unrecognized Keyword: %s", lexeme)
-	return s.errorToken(msg)
+	return s.errorToken(fmt.Sprintf("Unrecognized Keyword: %s", lexeme))
+
 }
 
 func (s *Scanner) number() Token {

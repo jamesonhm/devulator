@@ -2,10 +2,10 @@ package scpi
 
 //import "fmt"
 
+type InterpretResult int
+
 type VM struct {
 }
-
-type InterpretResult int
 
 const (
 	INTERPRET_OK InterpretResult = iota
@@ -16,4 +16,53 @@ const (
 func (vm *VM) Interpret(src string) InterpretResult {
 	compile(src)
 	return INTERPRET_OK
+}
+
+type void struct{}
+
+var m void
+
+var kws = map[string]void{
+	"ABOR":      m,
+	"ABORT":     m,
+	"AFR":       m,
+	"CALC":      m,
+	"CALCULATE": m,
+	"CALP":      m,
+	"CALPOD":    m,
+	"CONT":      m,
+	"CONTROL":   m,
+	"CSET":      m,
+	"DISP":      m,
+	"DISTLAY":   m,
+	"FORM":      m,
+	"FORMAT":    m,
+	"HCOP":      m,
+	"HCOPY":     m,
+	"INIT":      m,
+	"INITIATE":  m,
+	"LXI":       m,
+	"MMEM":      m,
+	"MMEMORY":   m,
+	"OUTP":      m,
+	"OUTPUT":    m,
+	"SENS":      m,
+	"SENSE":     m,
+	"SOUR":      m,
+	"SOURCE":    m,
+	"STAT":      m,
+	"STATUS":    m,
+	"SYST":      m,
+	"SYSTEM":    m,
+}
+
+func checkCommand() func(string) bool {
+	innerMap := map[string]void{
+		"ABORT": m,
+		"AFR":   m,
+	}
+	return func(key string) bool {
+		_, ok := innerMap[key]
+		return ok
+	}
 }
