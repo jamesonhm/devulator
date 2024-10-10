@@ -2,20 +2,25 @@ package scpi
 
 import "fmt"
 
-type opCode uint8
-
 type Chunk struct {
-	code []opCode
+	code      []uint8
+	constants valueArray
 }
 
 func InitChunk() Chunk {
 	return Chunk{
-		code: make([]opCode, 0),
+		code:      make([]uint8, 0),
+		constants: initValueArray(),
 	}
 }
 
-func (c *Chunk) WriteChunk(b opCode) {
+func (c *Chunk) WriteChunk(b uint8) {
 	c.code = append(c.code, b)
+}
+
+func (c *Chunk) AddConstant(value Value) uint8 {
+	c.constants.writeValue(value)
+	return uint8(len(c.constants.values) - 1)
 }
 
 func (c Chunk) DisassembleChunk(name string) {
@@ -29,9 +34,11 @@ func (c Chunk) DisassembleChunk(name string) {
 func (c Chunk) disassembleInstruction(offset int) int {
 	fmt.Printf("%04d ", offset)
 
-	var instruction opCode = c.code[offset]
+	var instruction uint8 = c.code[offset]
 
 	switch instruction {
+	case OP_CONSTANT:
+		return constantInstruction("OP_CONSTANT", c, offset)
 	case OP_RETURN:
 		return simpleInstruction("OP_RETURN", offset)
 	default:
@@ -45,6 +52,15 @@ func simpleInstruction(name string, offset int) int {
 	return offset + 1
 }
 
+func constantInstruction(name string, c Chunk, offset int) int {
+	constloc := uint8(c.code[offset+1])
+	fmt.Printf("%-16s %4d '", name, constloc)
+	printValue(c.constants.values[constloc])
+	fmt.Printf("\n")
+	return offset + 2
+}
+
 const (
-	OP_RETURN opCode = iota + 1
+	OP_RETURN uint8 = iota + 1
+	OP_CONSTANT
 )
