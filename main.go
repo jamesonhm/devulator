@@ -18,10 +18,10 @@ func main() {
 func run() (int, error) {
 	chunk := scpi.InitChunk()
 	constloc := chunk.AddConstant(1.2)
-	chunk.WriteChunk(scpi.OP_CONSTANT)
-	chunk.WriteChunk(constloc)
+	chunk.WriteChunk(scpi.OP_CONSTANT, 123)
+	chunk.WriteChunk(constloc, 123)
 
-	chunk.WriteChunk(scpi.OP_RETURN)
+	chunk.WriteChunk(scpi.OP_RETURN, 123)
 
 	chunk.DisassembleChunk("test chunk")
 	return 0, nil

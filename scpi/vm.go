@@ -5,6 +5,8 @@ package scpi
 type InterpretResult int
 
 type VM struct {
+	chunk *Chunk
+	ip    uint8
 }
 
 const (
@@ -14,8 +16,19 @@ const (
 )
 
 func (vm *VM) Interpret(src string) InterpretResult {
-	compile(src)
-	return INTERPRET_OK
+	chunk := InitChunk()
+	var parser Parser = Parser{}
+
+	if !parser.compile(src, &chunk) {
+		return INTERPRET_COMPILE_ERROR
+	}
+
+	vm.chunk = &chunk
+	vm.ip = vm.chunk.*code
+
+	var result InterpretResult = run()
+
+	return result
 }
 
 type void struct{}
