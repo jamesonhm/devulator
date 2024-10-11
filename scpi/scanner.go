@@ -78,7 +78,9 @@ func (s *Scanner) scanToken() Token {
 	case ';':
 		return s.makeToken(SEMICOLON)
 	case '"':
-		return s.string()
+		return s.string('"')
+	case '\'':
+		return s.string('\'')
 	case '<':
 		return s.makeToken(LESS)
 	case '>':
@@ -188,8 +190,8 @@ func (s *Scanner) skipWitespace() {
 	}
 }
 
-func (s *Scanner) string() Token {
-	for s.peek(0) != '"' && !s.isAtEnd() {
+func (s *Scanner) string(qtype rune) Token {
+	for s.peek(0) != qtype && !s.isAtEnd() {
 		if s.peek(0) == '\n' {
 			s.line++
 		}
@@ -227,8 +229,9 @@ func (s *Scanner) identifier() Token {
 		return s.makeToken(SPECIAL)
 	} else if wordInSet(word, BOOLS) {
 		return s.makeToken(BOOL)
-	} else if wordInSet(word, COMMONS) {
-		return s.makeToken(COMMON_CMD)
+		// 	}
+		// 	else if wordInSet(word, COMMONS) {
+		// 		return s.makeToken(COMMON_CMD)
 	} else {
 		return s.makeToken(NODE)
 	}

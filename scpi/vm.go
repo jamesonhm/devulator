@@ -17,18 +17,18 @@ const (
 
 func (vm *VM) Interpret(src string) InterpretResult {
 	chunk := InitChunk()
-	var parser Parser = Parser{}
 
+	var parser Parser = Parser{}
 	if !parser.compile(src, &chunk) {
 		return INTERPRET_COMPILE_ERROR
 	}
 
 	vm.chunk = &chunk
-	vm.ip = vm.chunk.*code
+	vm.ip = vm.chunk.code[0]
 
-	var result InterpretResult = run()
+	//	var result InterpretResult = run()
 
-	return result
+	return INTERPRET_OK
 }
 
 type void struct{}
