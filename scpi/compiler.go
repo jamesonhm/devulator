@@ -1,13 +1,12 @@
 package scpi
 
-import "os"
-
 import (
 	"fmt"
+	"os"
 )
 
-type Parser struct {
-	scanner   Scanner
+type parser struct {
+	scanner   *scanner
 	current   Token
 	previous  Token
 	hadError  bool
@@ -20,26 +19,16 @@ func currentChunk() *Chunk {
 	return compilingChunk
 }
 
-func (p *Parser) compile(source string, chunk *Chunk) bool {
-	p.scanner = initScanner(source)
-	compilingChunk = chunk
-
-	fmt.Println("compiler, scanner init done")
-
-	p.hadError = false
-	p.panicMode = false
-	p.advance()
-
-	fmt.Println("first advance, curr token: ", p.current)
-
-	p.command()
-
-	p.consume(EOF, "Expect end of expression")
-	// p.endCompiler()
-	return !p.hadError
+func initParser(source string) *parser {
+	p := &parser{
+		scanner:   initScanner(source),
+		hadError:  false,
+		panicMode: false,
+	}
+	return p
 }
 
-func (p *Parser) advance() {
+func (p *parser) advance() {
 	p.previous = p.current
 
 	for {
@@ -51,7 +40,7 @@ func (p *Parser) advance() {
 	}
 }
 
-func (p *Parser) consume(tType TokenType, message string) {
+func (p *parser) consume(tType TokenType, message string) {
 	if p.current.tType == tType {
 		p.advance()
 		return
@@ -60,42 +49,11 @@ func (p *Parser) consume(tType TokenType, message string) {
 	p.errorAtCurrent(message)
 }
 
-// command produces a cmd struct
-// includes the tree sequence, query, args
-// parse -> vm uses a queue structure to eval command units in fifo sequence order
-func (p *Parser) command() {
-	var cmdseq = make([]Token, 0)
-	for {
-		if p.match(WHITE_SPACE) {
-			fmt.Println("reached end of cmd tree, handle args")
-			break
-		}
-		if p.match(SEMICOLON) {
-			fmt.Println("semicolon - command separator")
-		}
-		if p.match(COLON) {
-			// Leading colon starts the command at the root
-			continue
-		}
-		if p.match(QUERY) {
-			fmt.Println("Query")
-		}
-		if p.match(NEWLINE) {
-			fmt.Println("End of line")
-			break
-		}
-		cmdseq = append(cmdseq, p.current)
-		p.advance()
-	}
-	fmt.Printf("%v", cmdseq)
-	fmt.Printf("\n")
-}
-
-func (p *Parser) check(tType TokenType) bool {
+func (p *parser) check(tType TokenType) bool {
 	return p.current.tType == tType
 }
 
-func (p *Parser) match(tType TokenType) bool {
+func (p *parser) match(tType TokenType) bool {
 	if !p.check(tType) {
 		return false
 	}
@@ -103,15 +61,15 @@ func (p *Parser) match(tType TokenType) bool {
 	return true
 }
 
-func (p *Parser) errorAtCurrent(message string) {
+func (p *parser) errorAtCurrent(message string) {
 	p.errorAt(p.current, message)
 }
 
-func (p *Parser) errorPrev(message string) {
+func (p *parser) errorPrev(message string) {
 	p.errorAt(p.previous, message)
 }
 
-func (p *Parser) errorAt(token Token, message string) {
+func (p *parser) errorAt(token Token, message string) {
 	if p.panicMode {
 		return
 	}
@@ -128,4 +86,43 @@ func (p *Parser) errorAt(token Token, message string) {
 
 	fmt.Fprintf(os.Stderr, ": %s\n", message)
 	p.hadError = true
+}
+
+func compile(source string, chunk *Chunk) bool {
+	p := initParser(source)
+	compilingChunk = chunk
+
+	p.hadError = false
+	p.panicMode = false
+	p.advance()
+
+	for !p.match(EOF) {
+		programHeader(p)
+	}
+
+	p.consume(EOF, "Expect end of expression")
+	// p.endCompiler()
+	return !p.hadError
+}
+
+// programHeader produces a cmd struct
+// includes the tree sequence, query, args
+// parse -> vm uses a queue structure to eval programHeader units in fifo sequence order
+func programHeader(p *parser) {
+	if p.match(COLON) {
+		// Leading colon starts the command at the root
+		instrumentHeader(p)
+	}
+	if p.match(COMMON_CMD) {
+		commonHeader(p)
+	}
+
+}
+
+func instrumentHeader(p *parser) {
+	return
+}
+
+func commonHeader(p *parser) {
+	return
 }

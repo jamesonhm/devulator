@@ -1,7 +1,9 @@
 /* SCPI Grammar in Extended Backus-Naur Form (EBNF) */
 
 /* Top-level structure */
-Command ::= Header [Query] [WhiteSpace] [Parameters] [Terminator]
+ProgramHeader ::= CommonCommandHdr | InstrumentControlHdr
+CommonCommandHdr ::= "*" Node [Query]
+InstrumentControlHdr ::= Header [Query] [WhiteSpace] [Parameters] [Terminator]
 
 /* Header structure */
 Header ::= [Colon] Node {Colon Node}

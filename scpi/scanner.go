@@ -6,14 +6,25 @@ import (
 	"unicode"
 )
 
-type Scanner struct {
+type scanner struct {
 	source  []rune
 	start   int
 	current int
 	line    int
 }
 
-func (s *Scanner) scanToken() Token {
+func initScanner(src string) *scanner {
+	src = trimLeftSpace(strings.ToUpper(src))
+	runesrc := []rune(src)
+	return &scanner{
+		source:  runesrc,
+		start:   0,
+		current: 0,
+		line:    1,
+	}
+}
+
+func (s *scanner) scanToken() Token {
 	// s.skipWitespace()
 	s.start = s.current
 	if s.isAtEnd() {
@@ -114,30 +125,19 @@ func trimLeftSpace(s string) string {
 	return strings.TrimLeftFunc(s, unicode.IsSpace)
 }
 
-func initScanner(src string) Scanner {
-	src = trimLeftSpace(strings.ToUpper(src))
-	runesrc := []rune(src)
-	return Scanner{
-		source:  runesrc,
-		start:   0,
-		current: 0,
-		line:    1,
-	}
-}
-
-func (s *Scanner) advance() rune {
+func (s *scanner) advance() rune {
 	s.current++
 	return s.source[s.current-1]
 }
 
-func (s *Scanner) peek(n int) rune {
+func (s *scanner) peek(n int) rune {
 	if s.current+n >= len(s.source) {
 		return '\000'
 	}
 	return s.source[s.current+n]
 }
 
-func (s *Scanner) match(expected rune) bool {
+func (s *scanner) match(expected rune) bool {
 	if s.isAtEnd() {
 		return false
 	}
@@ -148,11 +148,11 @@ func (s *Scanner) match(expected rune) bool {
 	return true
 }
 
-func (s *Scanner) isAtEnd() bool {
+func (s *scanner) isAtEnd() bool {
 	return s.current >= len(s.source)
 }
 
-func (s *Scanner) makeToken(tt TokenType) Token {
+func (s *scanner) makeToken(tt TokenType) Token {
 	return Token{
 		tType:  tt,
 		lexeme: string(s.source[s.start:s.current]),
@@ -162,7 +162,7 @@ func (s *Scanner) makeToken(tt TokenType) Token {
 	}
 }
 
-func (s *Scanner) errorToken(msg string) Token {
+func (s *scanner) errorToken(msg string) Token {
 	return Token{
 		tType:  ERROR,
 		lexeme: msg,
@@ -172,7 +172,7 @@ func (s *Scanner) errorToken(msg string) Token {
 	}
 }
 
-func (s *Scanner) skipWitespace() {
+func (s *scanner) skipWitespace() {
 	if s.isAtEnd() {
 		return
 	}
@@ -190,7 +190,7 @@ func (s *Scanner) skipWitespace() {
 	}
 }
 
-func (s *Scanner) string(qtype rune) Token {
+func (s *scanner) string(qtype rune) Token {
 	for s.peek(0) != qtype && !s.isAtEnd() {
 		if s.peek(0) == '\n' {
 			s.line++
@@ -204,7 +204,7 @@ func (s *Scanner) string(qtype rune) Token {
 	return s.makeToken(STRING)
 }
 
-func (s *Scanner) whitespace() Token {
+func (s *scanner) whitespace() Token {
 	for {
 		c := s.peek(0)
 		switch c {
@@ -216,14 +216,14 @@ func (s *Scanner) whitespace() Token {
 	}
 }
 
-func (s *Scanner) word() string {
+func (s *scanner) word() string {
 	for unicode.IsLetter(s.peek(0)) {
 		s.advance()
 	}
 	return string(s.source[s.start:s.current])
 }
 
-func (s *Scanner) identifier() Token {
+func (s *scanner) identifier() Token {
 	word := s.word()
 	if wordInSet(word, SPECIALS) {
 		return s.makeToken(SPECIAL)
@@ -237,7 +237,7 @@ func (s *Scanner) identifier() Token {
 	}
 }
 
-func (s *Scanner) number() Token {
+func (s *scanner) number() Token {
 	for unicode.IsDigit(s.peek(0)) {
 		s.advance()
 	}
