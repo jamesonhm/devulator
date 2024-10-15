@@ -1,23 +1,43 @@
 package scpi
 
-import "fmt"
+//import "fmt"
 
-type Value float64
+type valueType int
 
-type valueArray struct {
-	values []Value
+const (
+	VAL_BOOL valueType = iota + 1
+	VAL_NUMBER
+	VAL_STRING
+)
+
+type value struct {
+	vType     valueType
+	boolean   bool
+	number    float64
+	stringval string
 }
 
-func initValueArray() valueArray {
-	return valueArray{
-		values: make([]Value, 0),
+func newNumberValue(val float64) value {
+	return value{
+		vType:  VAL_NUMBER,
+		number: val,
 	}
 }
 
-func (va *valueArray) writeValue(value Value) {
-	va.values = append(va.values, value)
-}
-
-func printValue(value Value) {
-	fmt.Printf("%g", value)
-}
+// type valueArray struct {
+// 	values []Value
+// }
+//
+// func initValueArray() valueArray {
+// 	return valueArray{
+// 		values: make([]Value, 0),
+// 	}
+// }
+//
+// func (va *valueArray) writeValue(value Value) {
+// 	va.values = append(va.values, value)
+// }
+//
+// func printValue(value Value) {
+// 	fmt.Printf("%g", value)
+// }

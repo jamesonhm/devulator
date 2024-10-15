@@ -33,9 +33,9 @@ func run() (int, error) {
 	// 	12
 	// 	23.4
 	// 	abort:AbO:CalculaTE`
-	src := `TEST:A 1
-	:SOMETHING:OTHER;"
-	*RST:*ESE?`
+	src := `MEASure:VOLTage:RISE:TIME 0.2V,4.5V,.005S
+:SOMETHING:OTHER;
+*RST:*ESE?`
 	fmt.Println("Source: ", src)
 
 	vm := scpi.VM{}

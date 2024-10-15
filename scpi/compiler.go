@@ -124,14 +124,14 @@ func programHeader(p *parser) {
 }
 
 func instrumentHeader(p *parser) {
-	fmt.Printf("Inst Header: ")
+	fmt.Println("Inst Header: ")
 	cmdTree := make([]Token, 0)
 	var count int = 0
 	for {
 		if count > 5 {
 			break
 		}
-		fmt.Println("instr loop, current token: ", p.current.lexeme)
+		fmt.Printf("instr loop, current token: %q, %s\n", p.current.lexeme, p.current.tType.tokenString())
 		if p.match(COLON) {
 			continue
 		} else if p.match(NODE) {
@@ -150,7 +150,7 @@ func instrumentHeader(p *parser) {
 		}
 		count++
 	}
-	fmt.Println(cmdTree)
+	fmt.Println("cmd tree: ", cmdTree)
 }
 
 func commonHeader(p *parser) {
@@ -159,7 +159,8 @@ func commonHeader(p *parser) {
 }
 
 func argList(p *parser) { // []Token {
-	args := make([]Token, 0)
+	fmt.Printf("arglist: ")
+	args := make([]value, 0)
 	args = append(args, p.current)
 	var count int = 0
 	for p.match(COMMA) {
@@ -171,4 +172,8 @@ func argList(p *parser) { // []Token {
 		count++
 	}
 	fmt.Println(args)
+	p.advance()
+}
+
+func expression(p *parser) {
 }

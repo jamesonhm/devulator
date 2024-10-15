@@ -55,8 +55,8 @@ const (
 	NODE
 	UNITS
 	BOOL
-	SPECIAL // MIN, MAX, INF, ...
-	COMMON_CMD
+	SPECIAL    // MIN, MAX, INF, DEF,...
+	COMMON_CMD // starts with * -> *CMD
 	STRING
 
 	ERROR
