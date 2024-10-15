@@ -33,9 +33,9 @@ func run() (int, error) {
 	// 	12
 	// 	23.4
 	// 	abort:AbO:CalculaTE`
-	src := `TEST:A 1,"stringy
-	string continued"
-	123.45 ON OFF *RST`
+	src := `TEST:A 1
+	:SOMETHING:OTHER;"
+	*RST:*ESE?`
 	fmt.Println("Source: ", src)
 
 	vm := scpi.VM{}

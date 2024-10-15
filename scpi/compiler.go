@@ -88,6 +88,8 @@ func (p *parser) errorAt(token Token, message string) {
 	p.hadError = true
 }
 
+///////////////////////////////////////////////////////////////////////////////////
+
 func compile(source string, chunk *Chunk) bool {
 	p := initParser(source)
 	compilingChunk = chunk
@@ -95,9 +97,14 @@ func compile(source string, chunk *Chunk) bool {
 	p.hadError = false
 	p.panicMode = false
 	p.advance()
-
+	fmt.Printf("token after first advance: %v\n", p.current)
+	var count int = 0
 	for !p.match(EOF) {
+		if count > 5 {
+			break
+		}
 		programHeader(p)
+		count++
 	}
 
 	p.consume(EOF, "Expect end of expression")
@@ -105,24 +112,63 @@ func compile(source string, chunk *Chunk) bool {
 	return !p.hadError
 }
 
-// programHeader produces a cmd struct
+// programHeader produces a header tree
 // includes the tree sequence, query, args
 // parse -> vm uses a queue structure to eval programHeader units in fifo sequence order
 func programHeader(p *parser) {
-	if p.match(COLON) {
-		// Leading colon starts the command at the root
-		instrumentHeader(p)
-	}
-	if p.match(COMMON_CMD) {
+	if p.check(COMMON_CMD) {
 		commonHeader(p)
 	}
+	instrumentHeader(p)
 
 }
 
 func instrumentHeader(p *parser) {
-	return
+	fmt.Printf("Inst Header: ")
+	cmdTree := make([]Token, 0)
+	var count int = 0
+	for {
+		if count > 5 {
+			break
+		}
+		fmt.Println("instr loop, current token: ", p.current.lexeme)
+		if p.match(COLON) {
+			continue
+		} else if p.match(NODE) {
+			cmdTree = append(cmdTree, p.previous)
+		} else if p.match(WHITE_SPACE) {
+			argList(p)
+			// Output call with args
+		} else if p.match(QUERY) {
+			fmt.Println("Query")
+		} else if p.match(SEMICOLON) {
+			// Output call without args
+			break
+		} else if p.match(NEWLINE) {
+			// Output call without args
+			break
+		}
+		count++
+	}
+	fmt.Println(cmdTree)
 }
 
 func commonHeader(p *parser) {
-	return
+	fmt.Println("common Header")
+	p.advance()
+}
+
+func argList(p *parser) { // []Token {
+	args := make([]Token, 0)
+	args = append(args, p.current)
+	var count int = 0
+	for p.match(COMMA) {
+		if count > 5 {
+			break
+		}
+		args = append(args, p.current)
+		p.advance()
+		count++
+	}
+	fmt.Println(args)
 }

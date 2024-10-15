@@ -18,8 +18,7 @@ const (
 func (vm *VM) Interpret(src string) InterpretResult {
 	chunk := InitChunk()
 
-	var parser Parser = Parser{}
-	if !parser.compile(src, &chunk) {
+	if !compile(src, &chunk) {
 		return INTERPRET_COMPILE_ERROR
 	}
 
