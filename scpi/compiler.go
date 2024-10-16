@@ -19,9 +19,9 @@ func currentChunk() *Chunk {
 	return compilingChunk
 }
 
-func initParser(source string) *parser {
+func newParser(source string) *parser {
 	p := &parser{
-		scanner:   initScanner(source),
+		scanner:   newScanner(source),
 		hadError:  false,
 		panicMode: false,
 	}
@@ -91,7 +91,7 @@ func (p *parser) errorAt(token Token, message string) {
 ///////////////////////////////////////////////////////////////////////////////////
 
 func compile(source string, chunk *Chunk) bool {
-	p := initParser(source)
+	p := newParser(source)
 	compilingChunk = chunk
 
 	p.hadError = false

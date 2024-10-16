@@ -16,10 +16,33 @@ Query ::= "?"
 
 /* Parameters */
 Parameters ::= Parameter {Comma Parameter}
-Parameter ::= NumericParameter | DiscreetParameter | BooleanParameter
-NumericParameter ::= [Sign] Integer [Dot [Integer]] [Suffix] | SpecialValue
+Parameter ::= NumericParameter | DiscreetParameter | BooleanParameter | Expression
+NumericParameter ::= [Sign] Integer [Dot [Integer]] [Suffix] | SpecialValue [Units]
 DiscreetParameter ::= Character {Character}
 BooleanParameter ::= OFF | 0 | ON | 1
+Expression ::= NumericExpression | ChannelList | NumericList
+
+/* Expressions */
+NumericExpression ::= LogicOr
+LogicOr ::= LogicAnd ( "OR" LogicAnd )*
+LogicAnd ::= Term ( "AND" Term )*
+term ::= factor ( ( "-" | "+" ) factor )*
+factor ::= unary ( ( "/" | "*" ) unary )*
+unary ::= ( NOT | "-" | "+" ) Primary 
+Primary ::= Number
+
+NumericExpression ::= "(" [Unary] ( Number | NumericExpression ) [NumericOperator NumericExpression] ")"
+NumericOperator ::= "+" | "-" | "*" | "/" | "^" | "MOD" | "DIV" | "OR" | "AND" | "EXOR"
+Unary ::= "-" | "+" | "NOT"
+
+ChannelList ::= "(" "@" ( ChannelRange | ModuleChannel | PathName ) ["," ...] ")"
+ChannelRange ::= ChannelSpec ":" ChannelSpec  // Both must contain same number dimensions
+ModuleChannel ::= ModuleSpecifier "(" ChannelRange ["," ChannelRange] ")"
+ModuleSpecifier ::= Number | CharacterProgramData
+ChannelSpec ::= Number ["!" Number]*
+
+NumericList ::= "(" ( Number | NumericRange ) ["," (Number | NumericRange)] ")"
+NumericRange ::= Number ":" Number
 
 /* Basic elements */
 Colon ::= ":"
@@ -31,7 +54,7 @@ Sign ::= "+" | "-"
 Dot ::= "."
 Integer ::= Digit {Digit}
 Suffix ::= Character {Character}
-SpecialValue ::= MIN | MAX | DEF
+SpecialValue ::= MIN | MAX | DEF | UP | DOWN | INF | NINF | NAN
 
 /* Character sets */
 UpperCase ::= "A" | "B" | "C" | ... | "Z"
@@ -39,3 +62,15 @@ LowerCase ::= "a" | "b" | "c" | ... | "z"
 Digit ::= "0" | "1" | "2" | ... | "9"
 Character ::= UpperCase | LowerCase | Digit | SpecialCharacter
 SpecialCharacter ::= "!" | "@" | "#" | "$" | "%" | "^" | "&" | "*" | "(" | ")" | "-" | "_" | "+" | "=" | "[" | "]" | "{" | "}" | "|" | "\" | ":" | ";" | "'" | "<" | ">" | "," | "." | "?" | "/"
+
+PRECEDNECE
+1. Grouping
+2. Unary (+ and -)
+3. ^ (exponentiation)
+4. *, /, MOD, DIV
+5. + and - (add and subtract)
+6. NOT
+7. AND
+8. OR and EXOR
+9. Left to right
+

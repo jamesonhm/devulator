@@ -13,7 +13,7 @@ type scanner struct {
 	line    int
 }
 
-func initScanner(src string) *scanner {
+func newScanner(src string) *scanner {
 	src = trimLeftSpace(strings.ToUpper(src))
 	runesrc := []rune(src)
 	return &scanner{
