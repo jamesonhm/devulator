@@ -5,6 +5,29 @@ import (
 	"os"
 )
 
+type precedence int
+
+const (
+	PREC_NONE   precedence = iota
+	PREC_OR                // or, exor
+	PREC_AND               // and
+	PREC_NOT               // not
+	PREC_TERM              // + , -
+	PREC_FACTOR            // *, /, MOD, DIV
+	PREC_EXP               // ^
+	PREC_UNARY             // +, -
+	PREC_GROUP             // ()
+	PREC_PRIMARY
+)
+
+type parseFn func(p *parser)
+
+type parseRule struct {
+	prefix parseFn
+	infix  parseFn
+	prec   precedence
+}
+
 type parser struct {
 	scanner   *scanner
 	current   Token
@@ -175,5 +198,42 @@ func argList(p *parser) { // []Token {
 	p.advance()
 }
 
+var rules = map[TokenType]parseRule{
+	LEFT_PAREN:  parseRule{grouping, nil, PREC_GROUP},
+	RIGHT_PAREN: parseRule{nil, nil, PREC_NONE},
+	MINUS:       parseRule{unary, binary, PREC_TERM},
+	NUMBER:      parseRule{number, nil, PREC_NONE},
+}
+
+func getRule(tType TokenType) parseRule {
+	rule, ok := rules[tType]
+	if !ok {
+		return parseRule{}
+	}
+	return rule
+}
+
+func parsePrecedence(p *parser, prec precedence) {
+	p.advance()
+	var prefixRule parseFn = getRule(p.previous.tType).prefix
+	if prefixRule == nil {
+		p.errorPrev("Expect Expression")
+		return
+	}
+	prefixRule(p)
+
+	for prec < getRule(p.current.tType).prec {
+		p.advance()
+		var infixRule parseFn = getRule(p.previous.tType).infix
+		infixRule(p)
+	}
+}
+
 func expression(p *parser) {
+	parsePrecedence(p, PREC_OR)
+}
+
+func grouping(p *parser) {
+	expression(p)
+	p.consume(RIGHT_PAREN, "Expect right paren")
 }
