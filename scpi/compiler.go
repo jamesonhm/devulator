@@ -198,14 +198,14 @@ func argList(p *parser) { // []Token {
 	p.advance()
 }
 
-var rules = map[TokenType]parseRule{
-	LEFT_PAREN:  parseRule{grouping, nil, PREC_GROUP},
-	RIGHT_PAREN: parseRule{nil, nil, PREC_NONE},
-	MINUS:       parseRule{unary, binary, PREC_TERM},
-	NUMBER:      parseRule{number, nil, PREC_NONE},
-}
-
 func getRule(tType TokenType) parseRule {
+
+	var rules = map[TokenType]parseRule{
+		LEFT_PAREN:  parseRule{grouping, nil, PREC_GROUP},
+		RIGHT_PAREN: parseRule{nil, nil, PREC_NONE},
+		MINUS:       parseRule{unary, binary, PREC_TERM},
+		NUMBER:      parseRule{number, nil, PREC_NONE},
+	}
 	rule, ok := rules[tType]
 	if !ok {
 		return parseRule{}
