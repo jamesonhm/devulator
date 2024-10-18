@@ -32,7 +32,7 @@ func (vm *VM) Interpret(src string) InterpretResult {
 
 type void struct{}
 
-var m void
+var v void
 
 func wordInSet(s string, set map[string]void) bool {
 	_, ok := set[s]
@@ -43,64 +43,74 @@ func wordInSet(s string, set map[string]void) bool {
 }
 
 var SPECIALS = map[string]void{
-	"MIN": m,
-	"MAX": m,
-	"DEF": m,
+	"MIN": v,
+	"MAX": v,
+	"DEF": v,
 }
 
 var BOOLS = map[string]void{
-	"ON":  m,
-	"OFF": m,
+	"ON":  v,
+	"OFF": v,
 }
 
 var COMMONS = map[string]void{
-	"*CLS": m,
-	"*DMC": m,
-	"*EMC": m,
-	"*ESE": m,
-	"*ESR": m,
-	"*IDN": m,
-	"*LRN": m,
-	"*OPC": m,
-	"*PCB": m,
-	"*RST": m,
-	"*SRE": m,
-	"*STB": m,
-	"*TRG": m,
-	"*TST": m,
-	"*WAI": m,
+	"*CLS": v,
+	"*DMC": v,
+	"*EMC": v,
+	"*ESE": v,
+	"*ESR": v,
+	"*IDN": v,
+	"*LRN": v,
+	"*OPC": v,
+	"*PCB": v,
+	"*RST": v,
+	"*SRE": v,
+	"*STB": v,
+	"*TRG": v,
+	"*TST": v,
+	"*WAI": v,
 }
 
 var kws = map[string]void{
-	"ABOR":      m,
-	"ABORT":     m,
-	"AFR":       m,
-	"CALC":      m,
-	"CALCULATE": m,
-	"CALP":      m,
-	"CALPOD":    m,
-	"CONT":      m,
-	"CONTROL":   m,
-	"CSET":      m,
-	"DISP":      m,
-	"DISTLAY":   m,
-	"FORM":      m,
-	"FORMAT":    m,
-	"HCOP":      m,
-	"HCOPY":     m,
-	"INIT":      m,
-	"INITIATE":  m,
-	"LXI":       m,
-	"MMEM":      m,
-	"MMEMORY":   m,
-	"OUTP":      m,
-	"OUTPUT":    m,
-	"SENS":      m,
-	"SENSE":     m,
-	"SOUR":      m,
-	"SOURCE":    m,
-	"STAT":      m,
-	"STATUS":    m,
-	"SYST":      m,
-	"SYSTEM":    m,
+	"ABOR":      v,
+	"ABORT":     v,
+	"AFR":       v,
+	"CALC":      v,
+	"CALCULATE": v,
+	"CALP":      v,
+	"CALPOD":    v,
+	"CONT":      v,
+	"CONTROL":   v,
+	"CSET":      v,
+	"DISP":      v,
+	"DISTLAY":   v,
+	"FORM":      v,
+	"FORMAT":    v,
+	"HCOP":      v,
+	"HCOPY":     v,
+	"INIT":      v,
+	"INITIATE":  v,
+	"LXI":       v,
+	"MMEM":      v,
+	"MMEMORY":   v,
+	"OUTP":      v,
+	"OUTPUT":    v,
+	"SENS":      v,
+	"SENSE":     v,
+	"SOUR":      v,
+	"SOURCE":    v,
+	"STAT":      v,
+	"STATUS":    v,
+	"SYST":      v,
+	"SYSTEM":    v,
+}
+
+type deviceFn func(args ...value) value
+
+var deviceFns = map[string]deviceFn{
+	"MEASUREVOLTAGERISETIME": measureVoltageRiseTime,
+}
+
+func measureVoltageRiseTime(arg value) value {
+	return value{}
 }

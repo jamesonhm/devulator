@@ -11,16 +11,16 @@ const (
 )
 
 type value struct {
-	vType     valueType
-	boolean   bool
-	number    float64
-	stringval string
+	vType   valueType
+	boolval bool
+	numval  float64
+	strval  string
 }
 
 func newNumberValue(val float64) value {
 	return value{
 		vType:  VAL_NUMBER,
-		number: val,
+		numval: val,
 	}
 }
 

@@ -28,25 +28,28 @@ func main() {
 // }
 
 func run() (int, error) {
-	// 	src := `  COMMand:stuFF?;*ABC  *!=
-	// 	:DATA 4,"this is a string";
-	// 	12
-	// 	23.4
-	// 	abort:AbO:CalculaTE`
-	src := `MEASure:VOLTage:RISE:TIME 0.2V,4.5V,.005S
-:SOMETHING:OTHER;
-*RST:*ESE?`
-	fmt.Println("Source: ", src)
+	testCmds := []string{
+		"MEASure:VOLTage:RISE:TIME 0.2,4.5,.005\n",
+		"MEASure:VOLTage:RISE:TIME 0.2V,4.5V,.005S\n",
+		"*RST:*ESE?",
+	}
 
 	vm := scpi.VM{}
 
-	res := vm.Interpret(src)
-	if res != scpi.INTERPRET_OK {
-		switch res {
-		case scpi.INTERPRET_COMPILE_ERROR:
-			return 65, fmt.Errorf("Compile Error")
-		case scpi.INTERPRET_RUNTIME_ERROR:
-			return 70, fmt.Errorf("Runtime Error")
+	for i, cmd := range testCmds {
+		if i >= 1 {
+			return 0, nil
+		}
+		fmt.Println("Source: ", cmd)
+
+		res := vm.Interpret(cmd)
+		if res != scpi.INTERPRET_OK {
+			switch res {
+			case scpi.INTERPRET_COMPILE_ERROR:
+				return 65, fmt.Errorf("Compile Error")
+			case scpi.INTERPRET_RUNTIME_ERROR:
+				return 70, fmt.Errorf("Runtime Error")
+			}
 		}
 	}
 	return 0, nil

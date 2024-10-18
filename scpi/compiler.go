@@ -3,6 +3,8 @@ package scpi
 import (
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 type precedence int
@@ -112,6 +114,7 @@ func (p *parser) errorAt(token Token, message string) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////
+// maybe compile returns a stack/chunk with the op_call/query and the stack of arg expressions
 
 func compile(source string, chunk *Chunk) bool {
 	p := newParser(source)
@@ -148,7 +151,7 @@ func programHeader(p *parser) {
 
 func instrumentHeader(p *parser) {
 	fmt.Println("Inst Header: ")
-	cmdTree := make([]Token, 0)
+	cmdTree := make([]string, 0)
 	var count int = 0
 	for {
 		if count > 5 {
@@ -158,7 +161,7 @@ func instrumentHeader(p *parser) {
 		if p.match(COLON) {
 			continue
 		} else if p.match(NODE) {
-			cmdTree = append(cmdTree, p.previous)
+			cmdTree = append(cmdTree, p.previous.lexeme)
 		} else if p.match(WHITE_SPACE) {
 			argList(p)
 			// Output call with args
@@ -173,7 +176,8 @@ func instrumentHeader(p *parser) {
 		}
 		count++
 	}
-	fmt.Println("cmd tree: ", cmdTree)
+	cmdName := strings.Join(cmdTree, "")
+	fmt.Println("cmd tree: ", cmdName)
 }
 
 func commonHeader(p *parser) {
@@ -183,8 +187,9 @@ func commonHeader(p *parser) {
 
 func argList(p *parser) { // []Token {
 	fmt.Printf("arglist: ")
-	args := make([]value, 0)
+	args := make([]Token, 0)
 	args = append(args, p.current)
+	p.advance()
 	var count int = 0
 	for p.match(COMMA) {
 		if count > 5 {
@@ -199,13 +204,13 @@ func argList(p *parser) { // []Token {
 }
 
 func getRule(tType TokenType) parseRule {
-
 	var rules = map[TokenType]parseRule{
-		LEFT_PAREN:  parseRule{grouping, nil, PREC_GROUP},
-		RIGHT_PAREN: parseRule{nil, nil, PREC_NONE},
-		MINUS:       parseRule{unary, binary, PREC_TERM},
-		NUMBER:      parseRule{number, nil, PREC_NONE},
+		LEFT_PAREN:  {grouping, nil, PREC_GROUP},
+		RIGHT_PAREN: {nil, nil, PREC_NONE},
+		MINUS:       {unary, binary, PREC_TERM},
+		NUMBER:      {number, nil, PREC_NONE},
 	}
+
 	rule, ok := rules[tType]
 	if !ok {
 		return parseRule{}
@@ -236,4 +241,47 @@ func expression(p *parser) {
 func grouping(p *parser) {
 	expression(p)
 	p.consume(RIGHT_PAREN, "Expect right paren")
+}
+
+func unary(p *parser) {
+	var operType TokenType = p.previous.tType
+
+	// compile the operator
+	parsePrecedence(p, PREC_UNARY)
+
+	switch operType {
+	case MINUS:
+		fmt.Println("Emit Byte OP_NEGATE")
+	case PLUS:
+		fmt.Println("Emit Byte for Unary PLUS?")
+	default:
+		return
+	}
+}
+
+func binary(p *parser) {
+	var operType TokenType = p.previous.tType
+	prec := getRule(operType).prec
+	if prec == 0 {
+		p.errorPrev(fmt.Sprintf("No rule for %v", p.previous.lexeme))
+		return
+	}
+	parsePrecedence(p, prec+1)
+
+	switch operType {
+	case PLUS:
+		fmt.Println("Emit Byte OP_PLUS")
+	case MINUS:
+		fmt.Println("Emit Byte OP_SUBTRACT")
+	default:
+		return
+	}
+}
+
+func number(p *parser) {
+	val, err := strconv.ParseFloat(p.previous.lexeme, 64)
+	if err != nil {
+		p.errorPrev(err.Error())
+	}
+	fmt.Printf("Emit Constant %f\n", val)
 }
